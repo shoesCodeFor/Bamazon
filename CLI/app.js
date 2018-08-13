@@ -19,22 +19,25 @@ const config = {
     port: process.env.MYSQL_PORT,
     database: process.env.MYSQL_DB
 };
+const local = {
+    
+        host: "localhost",
+    
+        // Your port; if not 3306
+        port: 3306,
+    
+        // Your username
+        user: "root",
+    
+        // Your password
+        password: "",
+        database: "bamazon"
+    
+}
 
 // Then create a Node application called bamazonCustomer.js. Running this application will first display all of the items available for sale. Include the ids, names, and prices of products for sale.
 
-const connection = mysql.createConnection({
-    host: "localhost",
-
-    // Your port; if not 3306
-    port: 3306,
-
-    // Your username
-    user: "root",
-
-    // Your password
-    password: "",
-    database: "bamazon"
-});
+const connection = mysql.createConnection(config);
 const startCLI = () => {
     inquirer
         .prompt([
@@ -60,10 +63,16 @@ const startCLI = () => {
             const result = productList.find( product => product.product_name === productName );
 
             console.log(`Selected Prod:`);
-            console.log(result);
-            console.log(answers);
+            console.log(result.product_name);
+            // console.log(answers);
             console.log("Let us check if we have this in stock....");
-            updateProductQty(result, quantity);
+            if(result.stock_quantity > 0){
+                updateProductQty(result, quantity);
+            }
+            else{
+                console.log("Sorry out of Stock :(");
+            }
+            
         });
 };
 
@@ -89,14 +98,15 @@ const allProducts = () => {
         startCLI();
     });
 };
-const getProduct = (prodID, cb = undefined) => {
-    let qty;
+const getProduct = (prodID, purchQty, cb = undefined) => {
+    
     connection.query(`SELECT * from products where product_id = '${prodID}'`, function(err, rows, fields) {
         if(err) console.log(err);
-        console.log('All products: ', rows);
-
-        qty = rows[0].stock_quantity-1;
-        console.log('Inventory Updated: ' + qty);
+        console.log("The product you purchased: ");
+        console.log(`${rows[0].product_name} Price: ${rows[0].price} Qty Purchased: ${purchQty}`);
+        console.log(`Total Price: ${(rows[0].price * purchQty).toFixed(2)}`);
+        let qty = rows[0].stock_quantity;
+        console.log('Inventory Updated: ' + qty +' avaialable');
         if(cb){
             return cb(prodID, qty)
         }
@@ -111,10 +121,10 @@ const updateProductQty = (prod, qty) => {
     let newQty = prod.stock_quantity - qty;
     connection.query(`UPDATE \`products\` SET \`stock_quantity\` = '${newQty}' WHERE \`products\`.\`product_id\` = ${prodID};`, function(err, rows, fields) {
         if(err) console.log(err);
-        console.log('Single Product: ', rows);
+        // console.log('Single Product: ', rows);
         // connection.end();
     });
-    getProduct(prodID);
+    getProduct(prodID, qty);
     // allProducts();
 };
 
