@@ -4,8 +4,6 @@ var express = require('express');
 var router = express.Router();
 
 
-console.log(process.env.TWITTER_CONSUMER_KEY);
-
 var connection = mysql.createConnection({
     host: "localhost",
 
@@ -36,6 +34,9 @@ const allProducts = function (res){
 };
 
 router.get('/', function(req, res, next) {
+    var product_id = req.param('product_id');
+    var qty = req.param('qty');
+    console.log(product_id + " " + qty);
     allProducts(res);
     // allProducts(res);
 });
