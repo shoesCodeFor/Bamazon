@@ -1,12 +1,8 @@
 require("dotenv").config();
 const mysql = require("mysql");
-var express = require('express');
-var router = express.Router();
-
-
 console.log(process.env.TWITTER_CONSUMER_KEY);
 
-var connection = mysql.createConnection({
+const connection = mysql.createConnection({
     host: "localhost",
 
     // Your port; if not 3306
