@@ -5,3 +5,6 @@ This is a faux service with no real purchasing ability.  You can, however, selec
 
 ## Using the CLI tool
 
+
+### Screenshots
+<img src="screenshots/CLI-Demo.gif">
